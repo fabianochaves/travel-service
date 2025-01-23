@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: travel
+    ports:
+      - "3306:3306"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: 123
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+  laravel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    volumes:
+      - ./travel-requests:/var/www/html
+    depends_on:
+      - db
