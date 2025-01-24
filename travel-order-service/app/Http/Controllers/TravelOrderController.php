@@ -94,23 +94,74 @@ class TravelOrderController extends Controller
     // Listar todos os pedidos de viagem
     public function index(Request $request)
     {
-        $query = TravelOrder::where('user_id', auth()->user()->id);
 
+    if (!auth()->check()) {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    $query = TravelOrder::where('user_id', auth()->user()->id);
+    
+    // Validar status
+    if ($request->has('status') && !in_array($request->status, ['requested', 'approved', 'canceled'])) {
+        return response()->json(['message' => 'Invalid status provided.'], 400); // Retornando 400 em caso de status inválido
+    }
+    
+        // Validar e converter formato de datas (dd/mm/YYYY para YYYY-mm-dd)
+        if ($request->has('departure_date') && !$this->isValidDate($request->departure_date)) {
+            return response()->json(['message' => 'Invalid departure_date format. Use dd/mm/YYYY.'], 400);
+        }
+    
+        if ($request->has('return_date') && !$this->isValidDate($request->return_date)) {
+            return response()->json(['message' => 'Invalid return_date format. Use dd/mm/YYYY.'], 400);
+        }
+    
+        // Converter as datas para o formato adequado (YYYY-mm-dd) antes de consultar o banco
+        if ($request->has('departure_date') && $this->isValidDate($request->departure_date)) {
+            $request->merge(['departure_date' => $this->convertDateToDatabaseFormat($request->departure_date)]);
+        }
+    
+        if ($request->has('return_date') && $this->isValidDate($request->return_date)) {
+            $request->merge(['return_date' => $this->convertDateToDatabaseFormat($request->return_date)]);
+        }
+    
+        // Filtrar por status
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
-
-        if ($request->has('start_date') && $request->has('end_date')) {
-            $query->whereBetween('departure_date', [$request->start_date, $request->end_date]);
+    
+        // Filtrar por data de partida (departure_date) - usando o formato YYYY-mm-dd
+        if ($request->has('departure_date')) {
+            $query->whereDate('departure_date', $request->departure_date); // Filtrando apenas pela data de partida
         }
-
+    
+        // Filtrar por intervalo de datas (departure_date e return_date)
+        if ($request->has('departure_date') && $request->has('return_date')) {
+            $query->whereBetween('departure_date', [$request->departure_date, $request->return_date]);
+        }
+    
+        // Filtrar por destino
         if ($request->has('destination')) {
             $query->where('destination', 'like', '%'.$request->destination.'%');
         }
-
+    
         $travelOrders = $query->get();
-
+    
         return response()->json(['travel_orders' => $travelOrders]);
     }
+    
+    // Método auxiliar para validar o formato da data (dd/mm/YYYY)
+    private function isValidDate($date)
+    {
+        $d = \DateTime::createFromFormat('d/m/Y', $date);
+        return $d && $d->format('d/m/Y') === $date;
+    }
+    
+    // Método auxiliar para converter a data de dd/mm/YYYY para YYYY-mm-dd
+    private function convertDateToDatabaseFormat($date)
+    {
+        $d = \DateTime::createFromFormat('d/m/Y', $date);
+        return $d ? $d->format('Y-m-d') : null;
+    }
+    
 
 }
