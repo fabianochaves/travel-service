@@ -5,9 +5,10 @@ services:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: 123
-      MYSQL_DATABASE: travel
+      MYSQL_DATABASE: travel_service
     ports:
       - "3306:3306"
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     environment:
@@ -17,6 +18,7 @@ services:
       - "8080:80"
     depends_on:
       - db
+
   laravel:
     build:
       context: .
@@ -24,6 +26,15 @@ services:
     ports:
       - "8000:80"
     volumes:
-      - ./travel-requests:/var/www/html
+      # O volume será montado depois que a estrutura do Laravel for criada
+      - ./travel-order-service:/var/www/html
     depends_on:
       - db
+    environment:
+      - COMPOSER_ALLOW_SUPERUSER=1
+    command: >
+      bash -c "
+      if [ ! -f /var/www/html/artisan ]; then
+        composer create-project --prefer-dist laravel/laravel /var/www/html;
+      fi &&
+      php -S 0.0.0.0:80 -t public"

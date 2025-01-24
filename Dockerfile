@@ -1,20 +1,30 @@
-# Base image
-FROM php:8.1-fpm
+# Usar uma imagem base com PHP 8.1
+FROM php:8.1-apache
 
-# Copiar arquivos do projeto
+# Instalar dependências do sistema necessárias (curl, git, unzip, etc.)
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    unzip \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    default-mysql-client \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd pdo pdo_mysql \
+    && rm -rf /var/lib/apt/lists/*
+
+# Habilitar o módulo rewrite do Apache (necessário para o Laravel)
+RUN a2enmod rewrite
+
+# Instalar o Composer
+RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
+
+# Definir o diretório de trabalho
 WORKDIR /var/www/html
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Copia os arquivos do projeto, incluindo o composer.json
-COPY travel-requests/ ./
-
-
-# Instalar dependências
-RUN composer install
-
-# Expor as portas
+# Expôr a porta 80 para o servidor Apache
 EXPOSE 80
 
-# Comando para iniciar a aplicação
-CMD ["php", "artisan", "serve", "--host", "0.0.0.0"]
+# Comando de inicialização padrão
+CMD ["apache2-foreground"]
