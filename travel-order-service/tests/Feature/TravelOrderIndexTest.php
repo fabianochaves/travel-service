@@ -6,9 +6,11 @@ use App\Models\User;
 use App\Models\TravelOrder;
 use Illuminate\Http\Response;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class TravelOrderIndexTest extends TestCase
 {
+    use DatabaseTransactions;
     // Método para criar um usuário e autenticar para os testes
     private function authenticateUser()
     {

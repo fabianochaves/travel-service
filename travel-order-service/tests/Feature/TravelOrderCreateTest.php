@@ -70,7 +70,7 @@ class TravelOrderCreateTest extends TestCase
         // Verifica se o status é 401 (Unauthorized) quando o usuário não está autenticado
         $response->assertStatus(401)
                  ->assertJson([
-                     'message' => 'Unauthenticated.',
+                     'message' => 'O Token é incompatível ou não foi informado!',
                  ]);
     }
 
