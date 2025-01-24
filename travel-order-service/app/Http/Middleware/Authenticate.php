@@ -12,6 +12,15 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        return $request->expectsJson() ? null : route('login');
+        if ($request->expectsJson()) {
+            // Retorna uma resposta JSON personalizada em caso de falta ou erro no token
+            return response()->json([
+                'message' => 'Token de autenticação não fornecido ou inválido. Por favor, faça login para acessar esta rota.'
+            ], 401); // Retorna código 401 (Unauthorized)
+        }
+    
+        // Para uma API, você não deve retornar uma URL de login. Retorne null.
+        return null;
     }
+    
 }

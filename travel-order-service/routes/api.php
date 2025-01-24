@@ -21,11 +21,10 @@ Route::post('register', [AuthController::class, 'register']);
 Route::middleware('auth:api')->get('user', [AuthController::class, 'me']);
 
 Route::middleware('auth:api')->group(function () {
-    Route::post('travel-orders', [TravelOrderController::class, 'store']); // Criar pedido
+    Route::post('travel-orders', [TravelOrderController::class, 'create']); // Criar pedido
     Route::put('travel-orders/{id}', [TravelOrderController::class, 'update']); // Atualizar pedido
     Route::get('travel-orders/{id}', [TravelOrderController::class, 'show']); // Consultar pedido
     Route::get('travel-orders', [TravelOrderController::class, 'index']); // Listar todos os pedidos
-    Route::put('travel-orders/{id}/cancel', [TravelOrderController::class, 'cancel']); // Cancelar pedido
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

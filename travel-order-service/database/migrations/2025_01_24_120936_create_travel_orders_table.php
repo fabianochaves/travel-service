@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('destination');
             $table->date('departure_date');
             $table->date('return_date');
-            $table->enum('status', ['solicitado', 'aprovado', 'cancelado']);
+            $table->enum('status', ['requested', 'approved', 'canceled']);
             $table->unsignedBigInteger('user_id'); // Adicionando o campo user_id
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); // Relacionamento com o User
             $table->timestamps();

@@ -6,6 +6,9 @@ use App\Models\TravelOrder;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
+use App\Notifications\TravelOrderStatusChanged;
+use Illuminate\Support\Facades\Notification;
 
 class TravelOrderController extends Controller
 {
@@ -18,8 +21,9 @@ class TravelOrderController extends Controller
     // Criar um pedido de viagem
     public function create(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'requester_name' => 'required|string|max:255',
             'destination' => 'required|string|max:255',
             'departure_date' => 'required|date',
             'return_date' => 'required|date|after:departure_date',
@@ -31,7 +35,7 @@ class TravelOrderController extends Controller
         }
 
         $travelOrder = TravelOrder::create([
-            'name' => $request->name,
+            'requester_name' => $request->requester_name,
             'destination' => $request->destination,
             'departure_date' => $request->departure_date,
             'return_date' => $request->return_date,
@@ -43,30 +47,34 @@ class TravelOrderController extends Controller
     }
 
     // Atualizar status de um pedido de viagem
-    public function updateStatus($id, Request $request)
+    public function update($id, Request $request)
     {
         $travelOrder = TravelOrder::findOrFail($id);
-
-        // Verificar se o usuário está tentando alterar o próprio pedido
-        if ($travelOrder->user_id !== auth()->user()->id) {
-            return response()->json(['message' => 'You can only update your own travel orders.'], 403);
-        }
 
         $validator = Validator::make($request->all(), [
             'status' => 'required|in:approved,canceled',
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        // Verificar se o pedido pode ser cancelado
-        if ($travelOrder->status === 'approved' && $request->status === 'canceled') {
-            return response()->json(['message' => 'You cannot cancel an approved travel order.'], 400);
+        // Verificar se o pedido pode ser cancelado (somente se for na mesma data de criação)
+        if ($request->status === 'canceled' && !Carbon::parse($travelOrder->created_at)->isToday()) {
+            return response()->json(['message' => 'You can only cancel a travel order on the same day it was created.'], 400);
+        }
+
+        // Verificar se o usuário está tentando alterar o próprio pedido
+        if ($travelOrder->user_id === auth()->user()->id) {
+            return response()->json(['message' => 'You can only update your own travel orders.'], 403);
         }
 
         $travelOrder->status = $request->status;
         $travelOrder->save();
+
+        // Enviar notificação para o usuário que solicitou o pedido
+        $user = $travelOrder->user;
+        $user->notify(new TravelOrderStatusChanged($request->status, $travelOrder));
 
         return response()->json(['travel_order' => $travelOrder]);
     }
@@ -105,24 +113,4 @@ class TravelOrderController extends Controller
         return response()->json(['travel_orders' => $travelOrders]);
     }
 
-    public function cancel($id)
-    {
-        $travelOrder = TravelOrder::findOrFail($id);
-
-        // Verificar se o pedido pertence ao usuário autenticado
-        if ($travelOrder->user_id !== auth()->user()->id) {
-            return response()->json(['message' => 'You can only cancel your own travel orders.'], 403);
-        }
-
-        // Verificar se o pedido já foi aprovado
-        if ($travelOrder->status !== 'approved') {
-            return response()->json(['message' => 'You can only cancel an approved travel order.'], 400);
-        }
-
-        // Alterar o status para cancelado
-        $travelOrder->status = 'canceled';
-        $travelOrder->save();
-
-        return response()->json(['message' => 'Travel order has been canceled successfully.', 'travel_order' => $travelOrder]);
-    }
 }
