@@ -24,21 +24,21 @@
 
 OBS: o .env_example já está configurado o banco de dados, basta apenas configurar o serviço de e-mail:
 
-MAIL_MAILER=smtp
+    MAIL_MAILER=smtp
 
-MAIL_HOST=SEU_SERVICO_SMTP
+    MAIL_HOST=SEU_SERVICO_SMTP
 
-MAIL_PORT=SUA_PORTA
+    MAIL_PORT=SUA_PORTA
 
-MAIL_USERNAME="SEU_EMAIL"
+    MAIL_USERNAME="SEU_EMAIL"
 
-MAIL_PASSWORD="SUA_SENHA"
+    MAIL_PASSWORD="SUA_SENHA"
 
-MAIL_ENCRYPTION="SUA_CRIPTOGRAFIA"
+    MAIL_ENCRYPTION="SUA_CRIPTOGRAFIA"
 
-MAIL_FROM_ADDRESS="SEU_EMAIL"
+    MAIL_FROM_ADDRESS="SEU_EMAIL"
 
-MAIL_FROM_NAME="${APP_NAME}"
+    MAIL_FROM_NAME="${APP_NAME}"
 
 7) Gere a chave via JWT no arquivo .env: php artisan jwt:secret
 
