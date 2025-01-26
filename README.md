@@ -12,15 +12,17 @@
 
 1) Clone o Repositório: git clone https://github.com/fabianochaves/travel-service.git
 
-2) Acesse a pasta a aplicação: cd travel-service
+2) Utilize o terminal e acesse a pasta que clonou o repositório.
 
-3) Suba os Containers do Docker com o comando: docker compose up -d
+3) Acesse a pasta da aplicação: cd travel-service
 
-4) Verifique o ID do container laravel (travel-service-laravel) e acesse o mesmo via terminal: docker exec -it ID_DO_CONTAINER bash
+4) Suba os Containers do Docker com o comando: docker compose up -d
 
-5) Dentro do container laravel, rode a instalação das dependências via Composer: composer install
+5) Verifique o ID do container laravel (travel-service-laravel) e acesse o mesmo via terminal: docker exec -it ID_DO_CONTAINER bash
 
-6) Na raiz do projeto, copie o arquivo .env_example e renomeie para .env via comando: cp .env.example .env
+6) Dentro do container laravel, rode a instalação das dependências via Composer: composer install
+
+7) Na raiz do projeto, copie o arquivo .env_example e renomeie para .env via comando: cp .env.example .env
 
 OBS: o .env_example já está configurado o banco de dados, basta apenas configurar o serviço de e-mail:
 
@@ -40,11 +42,11 @@ OBS: o .env_example já está configurado o banco de dados, basta apenas configu
 
     MAIL_FROM_NAME="${APP_NAME}"
 
-7) Gere a chave via JWT no arquivo .env: php artisan jwt:secret
+8) Gere a chave via JWT no arquivo .env: php artisan jwt:secret
 
-8) Rode a migração (migrations) das tabelas do banco de dados juntamente com a criação de usuários (seed): php artisan migrate --seed
+9) Rode a migração (migrations) das tabelas do banco de dados juntamente com a criação de usuários (seed): php artisan migrate --seed
 
-9) Execute os testes com o PHPUnit, rodando os comandos abaixo individualmente:
+10) Execute os testes com o PHPUnit, rodando os comandos abaixo individualmente:
 
 	./vendor/bin/phpunit --filter LoginTest
 
