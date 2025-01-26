@@ -82,7 +82,11 @@ class TravelOrderController extends Controller
     // Consultar um pedido de viagem
     public function show($id)
     {
-        $travelOrder = TravelOrder::findOrFail($id);
+        $travelOrder = TravelOrder::find($id);;
+
+        if (!$travelOrder) {
+            return response()->json(['error' => 'Order travel not found.'], 404);
+        }
 
         if ($travelOrder->user_id !== auth()->user()->id) {
             return response()->json(['message' => 'You can only view your own travel orders.'], 403);

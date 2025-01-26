@@ -48,4 +48,20 @@ class TravelOrderShowTest extends TestCase
         $response->assertStatus(403);
         $response->assertJson(['message' => 'You can only view your own travel orders.']);
     }
+
+    /**
+     * Testa se o usuário recebe um erro quando tenta visualizar uma ordem de viagem que não existe.
+     *
+     * @return void
+     */
+    public function test_user_cannot_view_non_existent_travel_order()
+    {
+        $user = User::factory()->create();
+
+        $nonExistentOrderId = 999; 
+        $response = $this->actingAs($user)->getJson("/api/travel-orders/{$nonExistentOrderId}");
+
+        $response->assertStatus(404);
+        $response->assertJson(['error' => 'Order travel not found.']);
+    }
 }
