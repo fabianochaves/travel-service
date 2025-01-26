@@ -11,10 +11,11 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class TravelOrderIndexTest extends TestCase
 {
     use DatabaseTransactions;
+
     // Método para criar um usuário e autenticar para os testes
     private function authenticateUser()
     {
-        $user = User::factory()->create(); // Criação do usuário via factory
+        $user = User::factory()->create();
         $this->actingAs($user); // Autenticando o usuário para a requisição
         return $user;
     }
@@ -22,13 +23,10 @@ class TravelOrderIndexTest extends TestCase
     // Teste para verificar o retorno quando o status é inválido
     public function test_invalid_status()
     {
-        // Em vez de usar o método authenticateUser(), crie e autentique um usuário diretamente
-        $user = \App\Models\User::factory()->create(); // Crie um usuário de teste usando uma fábrica
+        $user = \App\Models\User::factory()->create();
     
-        // Agora, autentique o usuário
         $response = $this->actingAs($user)->get('/api/travel-orders?status=invalid_status');
     
-        // Verifique se o código de status retornado é 400 (Bad Request) e a mensagem está correta
         $response->assertStatus(400)
                  ->assertJson([
                      'message' => 'Invalid status provided.'
@@ -38,10 +36,8 @@ class TravelOrderIndexTest extends TestCase
     // Teste para verificar o formato inválido da data
     public function test_invalid_departure_date_format()
     {
-        // Em vez de usar o método authenticateUser(), crie e autentique um usuário diretamente
-        $user = \App\Models\User::factory()->create(); // Crie um usuário de teste usando uma fábrica
+        $user = \App\Models\User::factory()->create();
     
-        // Agora, autentique o usuário
         $response = $this->actingAs($user)->get('/api/travel-orders?departure_date=2025-03-05');
 
         $response->assertStatus(Response::HTTP_BAD_REQUEST)
@@ -52,7 +48,7 @@ class TravelOrderIndexTest extends TestCase
     // Teste para verificar o filtro por destino
     public function test_filter_by_destination()
     {
-        $user = $this->authenticateUser(); // Autentica o usuário
+        $user = $this->authenticateUser();
 
         // Criar registros com destinos diferentes
         TravelOrder::create([
@@ -83,7 +79,7 @@ class TravelOrderIndexTest extends TestCase
     // Teste para verificar o filtro por status
     public function test_filter_by_status()
     {
-        $user = $this->authenticateUser(); // Autentica o usuário
+        $user = $this->authenticateUser();
 
         // Criar registros com status diferentes
         TravelOrder::create([

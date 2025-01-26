@@ -22,7 +22,6 @@ class TravelOrderShowTest extends TestCase
         $user = User::factory()->create();
         $travelOrder = TravelOrder::factory()->create(['user_id' => $user->id]);
 
-        // Logar como o mesmo usuário
         $response = $this->actingAs($user)->getJson("/api/travel-orders/{$travelOrder->id}");
 
         // Verificar se o pedido retornado é o correto
