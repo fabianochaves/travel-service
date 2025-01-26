@@ -46,14 +46,14 @@ OBS: o .env_example já está configurado o banco de dados, basta apenas configu
 
 9) Execute os testes com o PHPUnit, rodando os comandos abaixo individualmente:
 
-	a) ./vendor/bin/phpunit --filter LoginTest
+	./vendor/bin/phpunit --filter LoginTest
 
-	b) ./vendor/bin/phpunit --filter TravelOrderCreateTest
+	./vendor/bin/phpunit --filter TravelOrderCreateTest
+    
+    ./vendor/bin/phpunit --filter TravelOrderUpdateTest
 
-	c) ./vendor/bin/phpunit --filter TravelOrderUpdateTest
+	./vendor/bin/phpunit --filter TravelOrderShowTest
 
-	d) ./vendor/bin/phpunit --filter TravelOrderShowTest
-
-	e) ./vendor/bin/phpunit --filter TravelOrderIndexTest
+	./vendor/bin/phpunit --filter TravelOrderIndexTest
 
 OBS: Todas as rotinas de testes foram programadas para executar o teste e apagar apenas os dados gerados nos mesmos.
